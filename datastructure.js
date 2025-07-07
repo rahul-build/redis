@@ -27,12 +27,54 @@ async function redisDataStructures() {
       "user:age",
       "user:country",
     ]);
-    console.log(email, age, country);
+    // console.log(email, age, country);
 
     // lists->LPUSH,RPUSH,LRANGE,LPOP,RPOP
     await client.LPUSH("notes", ["note 1", "note 2", "note 3"]);
     const extractAllNotes = await client.lRange("notes", 0, -1);
-    console.log(extractAllNotes);
+    // console.log(extractAllNotes);
+
+    //sets
+    await client.sAdd("user:nickName", ["john", "varun", "xyz"]);
+    const extractUserNicknames = await client.sMembers("user:nickName");
+    console.log(extractUserNicknames);
+
+    const isVarunIsOneOfUserNickName = await client.sIsMember(
+      "user:nickName",
+      "varun"
+    );
+    console.log(isVarunIsOneOfUserNickName);
+
+    await client.sRem("user:nickName", "xyz");
+    const getUpdateUserNicknames = await client.sMembers("user:nickName");
+    console.log(getUpdateUserNicknames);
+
+    await client.zAdd("cart", [
+      {
+        score: 100,
+        value: "cart1",
+      },
+      {
+        score: 150,
+        value: "cart2",
+      },
+      {
+        score: 10,
+        value: "cart3",
+      },
+    ]);
+    const getcartItems = await client.zRange("cart", 0, -1);
+
+    console.log(getcartItems);
+    const extractAllCartItemsWithScore = await client.zRangeWithScores(
+      "cart",
+      0,
+      -1
+    );
+    console.log(extractAllCartItemsWithScore);
+
+    const cartTwoRank = await client.zRank("cart", "cart2");
+    console.log(cartTwoRank);
   } catch (error) {
     console.log(error);
   } finally {
